@@ -11,7 +11,7 @@ use rustc_serialize::json;
 /// The error type returned in a startuppong `Result`.
 #[derive(Debug)]
 pub enum ApiError {
-    /// when using add_match_with_names, an ID may not be found
+    /// An ID was not found for the given player name in a call to `get_player_ids`
     PlayerNotFound(String),
     /// Something went wrong during the request
     Http(hyper::error::Error),

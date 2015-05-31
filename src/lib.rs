@@ -4,6 +4,8 @@
 //! the JSON responses are represented with structs. The rustc_serialize crate is heavily relied on
 //! to handle decoding of JSON responses.
 //!
+//! Sign up for an account at [startuppong.com](http://www.startuppong.com).
+//!
 //! # Examples
 //! ```no_run
 //! use startuppong::Account;
@@ -33,10 +35,13 @@ use std::io::Read;
 use hyper::header::ContentType;
 use rustc_serialize::json;
 
-mod error;
+pub mod error;
 use error::ApiError;
 
-/// An account is necessary to make requests against the API
+/// An account is necessary to make requests against the API.
+///
+/// This struct holds your account ID and access key. It is a required argument to all of the API
+/// methods.
 #[derive(Debug, RustcEncodable)]
 pub struct Account {
     api_account_id: String,
@@ -44,6 +49,7 @@ pub struct Account {
 }
 
 impl Account {
+    /// Create a new Account
     pub fn new(id: String, key: String) -> Account {
         Account {
             api_account_id: id,
@@ -51,10 +57,12 @@ impl Account {
         }
     }
 
+    /// Return a ref to the api_account_id
     pub fn id(&self) -> &str {
         &self.api_account_id[..]
     }
 
+    /// Return a ref to the api_access_key
     pub fn key(&self) -> &str {
         &self.api_access_key[..]
     }
@@ -89,6 +97,9 @@ pub struct Match {
 }
 
 /// Wrapper for getting players so rustc_serialize can do all the heavy lifting for us.
+///
+/// Use [`players()`](struct.GetPlayersResponse.html#method.players) to consume the response and
+/// get the underlying `Vec<Player>`
 #[derive(Debug, RustcDecodable)]
 pub struct GetPlayersResponse {
     players: Vec<Player>
@@ -102,6 +113,9 @@ impl GetPlayersResponse {
 }
 
 /// Wrapper for APIs returning a match list.
+///
+/// Use [`matches()`](struct.GetMatchesResponse.html#method.matches) to consume the response and
+/// get the underlying `Vec<Match>`.
 #[derive(Debug, RustcDecodable)]
 pub struct GetMatchesResponse {
     matches: Vec<Match>
@@ -143,6 +157,8 @@ pub fn get_players_ids(account: &Account, names: Vec<&str>) -> Result<Vec<u32>, 
 }
 
 /// Return all players associated with the given account
+///
+/// Wraps `/api/v1/get_players`
 pub fn get_players(account: &Account) -> Result<GetPlayersResponse, ApiError> {
     let url = format!("http://www.startuppong.com/api/v1/get_players\
                       ?api_account_id={}&api_access_key={}", account.id(), account.key());
@@ -150,6 +166,8 @@ pub fn get_players(account: &Account) -> Result<GetPlayersResponse, ApiError> {
 }
 
 /// Return most recent matches on the given account
+///
+/// Wraps `/api/v1/get_recent_matches_for_company`
 pub fn get_recent_matches_for_company(account: &Account) -> Result<GetMatchesResponse, ApiError> {
     let url = format!("http://www.startuppong.com/api/v1/get_recent_matches_for_company\
                       ?api_account_id={}&api_access_key={}", account.id(), account.key());
@@ -157,6 +175,9 @@ pub fn get_recent_matches_for_company(account: &Account) -> Result<GetMatchesRes
 }
 
 /// Helper for retrieving a resource
+///
+/// `get` assumes that the http response is JSON formatted, and the parameterized type T
+/// implements rustc_serialize::Decodable.
 fn get<T>(url: &str) -> Result<T, ApiError>
     where T: rustc_serialize::Decodable {
     let mut client = hyper::Client::new();
@@ -167,6 +188,10 @@ fn get<T>(url: &str) -> Result<T, ApiError>
 }
 
 /// Add a match
+///
+/// Using the given `winner_id` and `loser_id`, create a new match. See
+/// [add_match_with_names](fn.add_match_with_names.html) for a potentially easier to consume API.
+/// This method wraps the `/api/v1/add_match` endpoint.
 pub fn add_match(account: &Account, winner_id: u32, loser_id: u32) -> Result<(), ApiError> {
     let mut client = hyper::Client::new();
     let data = format!("api_account_id={}&api_access_key={}&winner_id={}&loser_id={}",
@@ -179,7 +204,12 @@ pub fn add_match(account: &Account, winner_id: u32, loser_id: u32) -> Result<(),
     Ok(())
 }
 
-/// Add a match and try to resolve the given names
+/// Add a match using the given names.
+///
+/// It is possible for name lookup to fail. If that happens, the Result will unwrap to a
+/// `startuppong::ApiError::PlayerNotFound(String)` where the String is the first name not
+/// resolved. Names are matched in a case-sensitive fashion. The first result with a valid sub
+/// string match is accepted.
 pub fn add_match_with_names(account: &Account, winner: &str, loser: &str) -> Result<(), ApiError> {
     let names = vec![winner, loser];
     let ids = try!(get_players_ids(account, names));
@@ -188,10 +218,11 @@ pub fn add_match_with_names(account: &Account, winner: &str, loser: &str) -> Res
 
 /// Try and create an account from environment variables
 ///
-/// The environment variables needed are STARTUPPONG_ACCOUNT_ID and STARTUPPONG_ACCOUNT_KEY.
+/// The environment variables needed are **STARTUPPONG_ACCOUNT_ID** and
+/// **STARTUPPONG_ACCESS_KEY**.
 pub fn account_from_env() -> Result<Account, std::env::VarError> {
     Ok(Account::new(try!(env::var("STARTUPPONG_ACCOUNT_ID")),
-                    try!(env::var("STARTUPPONG_ACCOUNT_KEY"))))
+                    try!(env::var("STARTUPPONG_ACCESS_KEY"))))
 }
 
 #[cfg(test)]
