@@ -2,8 +2,14 @@
 name = "startuppong"
 version = "0.1.0"
 authors = ["Joe Wilm <jdwilm@gmail.com>"]
+license = "MIT"
+description = "startuppong.com API client"
+documentation = "http://www.jwilm.io/startuppong-client-rs/startuppong/"
+repository = "https://github.com/jwilm/startuppong-client-rs"
+readme = "README.md"
+keywords = ["leaderboard, "ping", "pong"]
 
 [dependencies]
-rustc-serialize = "0.3.14"
-hyper = "0.5.1"
-mime = "0.0.11"
+rustc-serialize = "~0.3"
+hyper = "~0.5"
+mime = "^0.0"
