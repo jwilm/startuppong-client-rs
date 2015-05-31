@@ -1,3 +1,5 @@
+///! Error types for startuppong apis
+
 extern crate hyper;
 extern crate rustc_serialize;
 
