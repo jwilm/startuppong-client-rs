@@ -35,6 +35,7 @@ use std::io::Read;
 use hyper::header::ContentType;
 use rustc_serialize::json;
 
+/// Error types, From impls, etc
 pub mod error;
 use error::ApiError;
 
@@ -96,7 +97,7 @@ pub struct Match {
     pub loser_id: u32
 }
 
-/// Wrapper for getting players so rustc_serialize can do all the heavy lifting for us.
+/// Wrapper for APIs returning a player list.
 ///
 /// Use [`players()`](struct.GetPlayersResponse.html#method.players) to consume the response and
 /// get the underlying `Vec<Player>`
