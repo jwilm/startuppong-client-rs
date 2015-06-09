@@ -58,6 +58,15 @@ impl Account {
         }
     }
 
+    /// Try and create an account from environment variables
+    ///
+    /// The environment variables needed are **STARTUPPONG_ACCOUNT_ID** and
+    /// **STARTUPPONG_ACCESS_KEY**.
+    pub fn from_env() -> Result<Account, std::env::VarError> {
+        Ok(Account::new(try!(env::var("STARTUPPONG_ACCOUNT_ID")),
+                        try!(env::var("STARTUPPONG_ACCESS_KEY"))))
+    }
+
     /// Return a ref to the api_account_id
     pub fn id(&self) -> &str {
         &self.api_account_id[..]
@@ -217,25 +226,16 @@ pub fn add_match_with_names(account: &Account, winner: &str, loser: &str) -> Res
     add_match(account, ids[0], ids[1])
 }
 
-/// Try and create an account from environment variables
-///
-/// The environment variables needed are **STARTUPPONG_ACCOUNT_ID** and
-/// **STARTUPPONG_ACCESS_KEY**.
-pub fn account_from_env() -> Result<Account, std::env::VarError> {
-    Ok(Account::new(try!(env::var("STARTUPPONG_ACCOUNT_ID")),
-                    try!(env::var("STARTUPPONG_ACCESS_KEY"))))
-}
-
 #[cfg(feature = "api_test")]
 #[cfg(test)]
 mod api_tests {
-    use super::account_from_env;
+    use super::Account;
     use super::get_players as get_players_;
     use super::get_players_ids as get_players_ids_;
 
     #[test]
     fn get_players() {
-        let account = account_from_env().unwrap();
+        let account = Account::from_env().unwrap();
         let player_res = get_players_(&account).unwrap();
         let players = player_res.players();
         // The account has been preconfigured with at least two players
@@ -244,7 +244,7 @@ mod api_tests {
 
     #[test]
     fn get_players_ids() {
-        let account = account_from_env().unwrap();
+        let account = Account::from_env().unwrap();
         let ids = get_players_ids_(&account, vec!["arst", "oien"]).unwrap();
         println!("{:?}", ids);
     }
