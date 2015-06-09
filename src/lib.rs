@@ -43,7 +43,7 @@ use error::ApiError;
 ///
 /// This struct holds your account ID and access key. It is a required argument to all of the API
 /// methods.
-#[derive(Debug, RustcEncodable)]
+#[derive(Debug, RustcEncodable, Clone)]
 pub struct Account {
     api_account_id: String,
     api_access_key: String
@@ -79,7 +79,7 @@ impl Account {
 }
 
 /// A person on the ladder
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, RustcDecodable, Clone)]
 pub struct Player {
     pub id: u32,
     pub rating: f32,
@@ -88,7 +88,7 @@ pub struct Player {
 }
 
 /// The stats before and after a set
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, RustcDecodable, Clone)]
 pub struct Match {
     pub loser_rating_after: f32,
     pub winner_rating_after: f32,
