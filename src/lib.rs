@@ -226,6 +226,30 @@ pub fn account_from_env() -> Result<Account, std::env::VarError> {
                     try!(env::var("STARTUPPONG_ACCESS_KEY"))))
 }
 
+#[cfg(feature = "api_test")]
+#[cfg(test)]
+mod api_tests {
+    use super::account_from_env;
+    use super::get_players as get_players_;
+    use super::get_players_ids as get_players_ids_;
+
+    #[test]
+    fn get_players() {
+        let account = account_from_env().unwrap();
+        let player_res = get_players_(&account).unwrap();
+        let players = player_res.players();
+        // The account has been preconfigured with at least two players
+        assert!(players.len() >= 2);
+    }
+
+    #[test]
+    fn get_players_ids() {
+        let account = account_from_env().unwrap();
+        let ids = get_players_ids_(&account, vec!["arst", "oien"]).unwrap();
+        println!("{:?}", ids);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use rustc_serialize::json;

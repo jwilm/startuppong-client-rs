@@ -9,6 +9,13 @@ repository = "https://github.com/jwilm/startuppong-client-rs"
 readme = "README.md"
 keywords = ["leaderboard", "ping", "pong"]
 
+[features]
+# Running `cargo test` with the api_test feature will run additional tests
+# against the startuppong.com live API servers. The environment tokens
+# STARTUPPONG_ACCOUND_ID and STARTUPPONG_ACCESS_KEY must be defined for these
+# tests to pass.
+api_test = []
+
 [dependencies]
 rustc-serialize = "~0.3"
 hyper = "~0.5"
