@@ -190,7 +190,7 @@ pub fn get_recent_matches_for_company(account: &Account) -> Result<GetMatchesRes
 /// implements rustc_serialize::Decodable.
 fn get<T>(url: &str) -> Result<T, ApiError>
     where T: rustc_serialize::Decodable {
-    let mut client = hyper::Client::new();
+    let client = hyper::Client::new();
     let mut res = try!(client.get(&url[..]).send());
     let mut body = String::new();
     try!(res.read_to_string(&mut body));
@@ -203,7 +203,7 @@ fn get<T>(url: &str) -> Result<T, ApiError>
 /// [add_match_with_names](fn.add_match_with_names.html) for a potentially easier to consume API.
 /// This method wraps the `/api/v1/add_match` endpoint.
 pub fn add_match(account: &Account, winner_id: u32, loser_id: u32) -> Result<(), ApiError> {
-    let mut client = hyper::Client::new();
+    let client = hyper::Client::new();
     let data = format!("api_account_id={}&api_access_key={}&winner_id={}&loser_id={}",
                        account.id(), account.key(), winner_id, loser_id);
     let url = "http://www.startuppong.com/api/v1/add_match";
