@@ -17,6 +17,6 @@ keywords = ["leaderboard", "ping", "pong"]
 api_test = []
 
 [dependencies]
-rustc-serialize = "~0.3"
-hyper = "0.6.4"
-mime = "^0.0"
+rustc-serialize = "0.3"
+hyper = "0.7"
+mime = "0.1"
